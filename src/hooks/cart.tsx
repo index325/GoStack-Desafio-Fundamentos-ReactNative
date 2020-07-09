@@ -37,16 +37,36 @@ const CartProvider: React.FC = ({ children }) => {
   }, []);
 
   const addToCart = useCallback(async product => {
-    // TODO ADD A NEW ITEM TO THE CART
-  }, []);
+    const prod: Product[] = products.filter(prod => product.id === prod.id);
+
+    if (prod.length > 0) {
+      increment(prod[0].id);
+      return;
+    }
+    setProducts([...products, { ...product, quantity: 1 }]);
+    await AsyncStorage.setItem('@GoMarket:Products', JSON.stringify(products));
+  }, [products]);
 
   const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+    console.log(products)
+    let prods = products.map(prod => {
+      if (prod.id === id) return { ...prod, quantity: prod.quantity + 1 };
+      return prod;
+    });
+
+    setProducts(prods);
+    await AsyncStorage.setItem('@GoMarket:Products', JSON.stringify(prods));
+  }, [products]);
 
   const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+    let prods = products.map(prod => {
+      if (prod.id === id) return { ...prod, quantity: prod.quantity - 1 };
+      return prod;
+    });
+
+    setProducts(prods);
+    await AsyncStorage.setItem('@GoMarket:Products', JSON.stringify(prods));
+  }, [products]);
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
